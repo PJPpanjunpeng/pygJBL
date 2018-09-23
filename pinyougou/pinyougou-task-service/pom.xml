@@ -67,6 +67,30 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
+
+    <properties>
+        <port>9009</port>
+    </properties>
+
+    <!--自定义maven环境配置-->
+    <profiles>
+
+        <profile>
+            <id>dev</id>
+            <properties>
+                <port>9009</port>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>pro</id>
+            <properties>
+                <port>10000</port>
+            </properties>
+        </profile>
+
+    </profiles>
+
     <build>
         <plugins>
             <!-- tomcat 插件  -->
@@ -75,7 +99,7 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <configuration>
                     <path>/</path>
-                    <port>9009</port>
+                    <port>${port}</port>
                 </configuration>
             </plugin>
         </plugins>
