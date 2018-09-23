@@ -59,20 +59,19 @@ public class SeckillOrderServiceImpl extends BaseServiceImpl<TbSeckillOrder> imp
         // 将存在redis中的商品库存减1；生成具体的秒杀商品订单保存到redis中；
         // 如果在秒杀商品库存减1之后的库存量为0的时候；需要将redis中的秒杀商品同步保存回到mysql中
 
-        //1、查询在redis中的秒杀商品并判断库存
-        TbSeckillGoods seckillGoods = (TbSeckillGoods) redisTemplate.boundHashOps(SeckillGoodsServiceImpl.SECKILL_GOODS).get(seckillId);
-
-        if (seckillGoods == null) {
-            throw new RuntimeException("秒杀商品不存在");
-        }
-
-        if(seckillGoods.getStockCount() == 0){
-            throw new RuntimeException("已秒杀完");
-        }
-
         //创建分布式锁
         RedisLock redisLock = new RedisLock(redisTemplate);
         if(redisLock.lock(seckillId.toString())) {
+            //1、查询在redis中的秒杀商品并判断库存
+            TbSeckillGoods seckillGoods = (TbSeckillGoods) redisTemplate.boundHashOps(SeckillGoodsServiceImpl.SECKILL_GOODS).get(seckillId);
+
+            if (seckillGoods == null) {
+                throw new RuntimeException("秒杀商品不存在");
+            }
+
+            if(seckillGoods.getStockCount() == 0){
+                throw new RuntimeException("已秒杀完");
+            }
             //2、递减库存
             seckillGoods.setStockCount(seckillGoods.getStockCount()-1);
 
